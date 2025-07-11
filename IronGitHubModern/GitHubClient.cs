@@ -3,9 +3,9 @@ using System.Net.Http.Json;
 
 namespace IronGitHubModern;
 
-    public class GitHubClient
-    {
-        private readonly HttpClient _http;
+public class GitHubClient
+{
+    private readonly HttpClient _http;
 
     public GitHubClient(HttpClient? httpClient = null)
     {
@@ -37,10 +37,24 @@ namespace IronGitHubModern;
         return (await response.Content.ReadFromJsonAsync<Repository>())!;
     }
 
+    public async Task<IReadOnlyList<Repository>> GetOrganizationRepositoriesAsync(string org)
+    {
+        var response = await _http.GetAsync($"/orgs/{org}/repos");
+        response.EnsureSuccessStatusCode();
+        return (await response.Content.ReadFromJsonAsync<List<Repository>>())!;
+    }
+
+    public async Task<IReadOnlyList<Organization>> GetUserOrganizationsAsync(string username)
+    {
+        var response = await _http.GetAsync($"/users/{username}/orgs");
+        response.EnsureSuccessStatusCode();
+        return (await response.Content.ReadFromJsonAsync<List<Organization>>())!;
+    }
+
     public async Task<Gist> GetGistAsync(string id)
     {
         var response = await _http.GetAsync($"/gists/{id}");
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<Gist>())!;
     }
-    }
+}
